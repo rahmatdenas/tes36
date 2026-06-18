@@ -341,45 +341,34 @@ nav li a.active {
   border-bottom: 1px solid #eee;
   background: #eee;
 }
-
-/* =========================================
-   1. Wadah Grid untuk Tombol Kontributor
-   ========================================= */
 .grid-kontrib {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* Membagi ruang menjadi 3 kolom sama besar */
-  gap: 15px;             /* Jarak antar kotak tombol */
-  margin-bottom: 20px;   /* Jarak ruang kosong di bawah grid */
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin-top: 20px;
+  margin-bottom: 20px;
 }
-
-/* =========================================
-   2. Desain Kotak Tombol (Diterapkan di tag <a>)
-   ========================================= */
 .tombolkontrib {
-  display: block;        /* SANGAT PENTING: Membuat area klik memenuhi seluruh kotak */
+  display: flex;
+  align-items: center;
+  justify-content: center;
   height: 100px;
-  line-height: 100px;    /* Memposisikan teks persis di tengah secara vertikal */
   width: 100%;
+  padding: 10px;
+  box-sizing: border-box;
   text-align: center;
   font-style: italic;
-  
-  /* Warna Dasar */
-  background-color: #822; 
-  color: #fff !important; /* Teks putih agar terbaca di latar gelap */
-  
-  text-decoration: none !important; /* Menghilangkan garis bawah bawaan link */
-  border-radius: 5px;     /* Opsional: Membuat sudut kotak sedikit membulat */
-  
-  /* Animasi transisi agar perubahan warnanya mulus (tidak kaku) */
+  line-height: 1.4;
+  background-color: #f3e9e9; 
+  color: #822; 
+  text-decoration: none;
+  border-radius: 5px;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* =========================================
-   3. Efek saat Kursor Menyentuh Tombol (Hover)
-   ========================================= */
 .tombolkontrib:hover {
-  background-color: #f3e9e9; 
-  color: #822 !important; 
+  background-color: #822; 
+  color: #fff; 
   cursor: pointer;
 }
 
