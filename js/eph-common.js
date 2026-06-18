@@ -253,6 +253,8 @@ function generateFigure(filename, classNames = []) {
         format : 'json',
         prop   : 'imageinfo',
         iiprop : 'extmetadata',
+        extmetadatalanguage: 'id', // Meminta nilai metadata dalam bahasa Indonesia
+        uselang: 'id',             // Meminta pesan sistem dalam bahasa Indonesia
         titles : 'File:' + filename,
       },
       function(data) {
