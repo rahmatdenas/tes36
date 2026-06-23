@@ -1,9 +1,11 @@
 'use strict';
 
-// KUNCI: Diubah dari 'let' menjadi 'var' agar terjangkau oleh fungsi resetApp di JS 1
 const CHUNK_SIZE = 35;
 var currentRenderIndex = 0;
 var currentFilteredRecords = [];
+
+// KUNCI PERBAIKAN: Variabel penahan telinga ganda
+var isFilterEventAttached = false; 
 
 function formatWikidataDate(dateString, precision) {
   if (!dateString) return null;  
@@ -70,8 +72,6 @@ function doPreProcessing() {
 }
 
 function populateProvinceTypesData() {
-  
-  // TANGKAP INPUT PENGGUNA
   let inputTxt = document.getElementById('jenis-input').value.trim();
   let dynamicQuery = SPARQL_QUERY_0.replace('<PLACEHOLDER_JENIS>', inputTxt);
 
@@ -119,15 +119,17 @@ function populateProvinceTypesData() {
     },
     function() {
       populateProvinceIndex(); 
-      SparqlValuesClause = 'VALUES ?site {' + Object.keys(Records).map(qid => `wd:${qid}`).join(' ') + '}';
       Object.values(Records).forEach(record => { record.indexTitle = record.title });
     },
   );
 }
 
 function populateCoordinatesData() {
+  let inputTxt = document.getElementById('jenis-input').value.trim();
+  let dynamicQuery = SPARQL_QUERY_1.replace('<PLACEHOLDER_JENIS>', inputTxt);
+
   return queryWdqsThenProcess(
-    SPARQL_QUERY_1,
+    dynamicQuery,
     function(result) {
       let record = Records[result.siteQid.value];
       let wktBits = result.coord.value.split(/\(|\)| /);
@@ -141,8 +143,11 @@ function populateCoordinatesData() {
 }
 
 function populateImageAndWikipediaData() {
+  let inputTxt = document.getElementById('jenis-input').value.trim();
+  let dynamicQuery = SPARQL_QUERY_3.replace('<PLACEHOLDER_JENIS>', inputTxt);
+
   return queryWdqsThenProcess(
-    SPARQL_QUERY_3,
+    dynamicQuery,
     function(result) {
       let record = Records[result.siteQid.value];      
       if ('image' in result) {
@@ -345,14 +350,15 @@ function populateProvinceIndexNodes() {
   });
 }
 
-let currentRegionFilter = 'all';
-let currentUsiaFilter = 'all';
-let activeFeatures = new Set(); 
-let currentSearchQuery = '';
+var currentRegionFilter = 'all';
+var currentUsiaFilter = 'all';
+var activeFeatures = new Set(); 
+var currentSearchQuery = '';
 
 function generateFilterSelect() {
   let selectRegion = document.getElementById('filter-region');
 
+  // Setiap kali data ditarik, kita perbarui opsi provinsi di dropdown
   selectRegion.innerHTML = `<option value="all">Semua Wilayah – ${ProvinceIndex['all'].total}</option>`;
   
   Object.keys(ProvinceIndex)
@@ -368,81 +374,86 @@ function generateFilterSelect() {
 
   applyIntersectionFilter(true);
   
-  selectRegion.addEventListener('change', function() {
-    currentRegionFilter = this.value;
-    applyIntersectionFilter();
-  });
-
-  let selectKombinasi = document.getElementById('filter-sort-kombinasi');
-  if (selectKombinasi) {
-    selectKombinasi.addEventListener('change', function() {
-      let pilihan = this.value;
-      currentUsiaFilter = 'all'; 
-
-      if (pilihan === 'filter-usia-50') {
-        currentUsiaFilter = 'usia_50'; 
-      } else if (pilihan === 'filter-usia-100') {
-        currentUsiaFilter = 'usia_100'; 
-      } else if (pilihan === 'filter-usia-200') {
-        currentUsiaFilter = 'usia_200'; 
-      } else if (pilihan === 'filter-usia-300') {
-        currentUsiaFilter = 'usia_300'; 
-      }
+  // === KUNCI PERBAIKAN: PASANG EVENT LISTENER HANYA 1 KALI ===
+  if (!isFilterEventAttached) {
+    
+    selectRegion.addEventListener('change', function() {
+      currentRegionFilter = this.value;
       applyIntersectionFilter();
     });
-  }
 
-  let btnAll = document.getElementById('btn-all');
-  let featButtons = document.querySelectorAll('.feat-btn:not(#btn-all)');
-
-  btnAll.addEventListener('click', function() {
-    activeFeatures.clear();
-    btnAll.classList.add('active');
-    featButtons.forEach(b => b.classList.remove('active'));
-
-    currentRegionFilter = 'all';
-    let selectRegion = document.getElementById('filter-region');
-    if (selectRegion) selectRegion.value = 'all';
-
-    currentUsiaFilter = 'all';
     let selectKombinasi = document.getElementById('filter-sort-kombinasi');
-    if (selectKombinasi) selectKombinasi.value = 'default';
+    if (selectKombinasi) {
+      selectKombinasi.addEventListener('change', function() {
+        let pilihan = this.value;
+        currentUsiaFilter = 'all'; 
 
-    currentSearchQuery = '';
-    let searchInput = document.getElementById('search-input');
-    if (searchInput) searchInput.value = '';
+        if (pilihan === 'filter-usia-50') {
+          currentUsiaFilter = 'usia_50'; 
+        } else if (pilihan === 'filter-usia-100') {
+          currentUsiaFilter = 'usia_100'; 
+        } else if (pilihan === 'filter-usia-200') {
+          currentUsiaFilter = 'usia_200'; 
+        } else if (pilihan === 'filter-usia-300') {
+          currentUsiaFilter = 'usia_300'; 
+        }
+        applyIntersectionFilter();
+      });
+    }
 
-    applyIntersectionFilter();
-  });
+    let btnAll = document.getElementById('btn-all');
+    let featButtons = document.querySelectorAll('.feat-btn:not(#btn-all)');
 
-  featButtons.forEach(btn => {
-    btn.addEventListener('click', function() {
-      let filterType = this.getAttribute('data-filter');
+    btnAll.addEventListener('click', function() {
+      activeFeatures.clear();
+      btnAll.classList.add('active');
+      featButtons.forEach(b => b.classList.remove('active'));
 
-      if (activeFeatures.has(filterType)) {
-        activeFeatures.delete(filterType);
-        this.classList.remove('active');
-      } else {
-        activeFeatures.add(filterType);
-        this.classList.add('active');
-      }
+      currentRegionFilter = 'all';
+      if (selectRegion) selectRegion.value = 'all';
 
-      if (activeFeatures.size === 0) {
-        btnAll.classList.add('active');
-      } else {
-        btnAll.classList.remove('active');
-      }
+      currentUsiaFilter = 'all';
+      if (selectKombinasi) selectKombinasi.value = 'default';
+
+      currentSearchQuery = '';
+      let searchInput = document.getElementById('search-input');
+      if (searchInput) searchInput.value = '';
 
       applyIntersectionFilter();
     });
-  });
 
-  let searchInput = document.getElementById('search-input');
-  if (searchInput) {
-    searchInput.addEventListener('input', function() {
-      currentSearchQuery = this.value.toLowerCase();
-      applyIntersectionFilter(); 
+    featButtons.forEach(btn => {
+      btn.addEventListener('click', function() {
+        let filterType = this.getAttribute('data-filter');
+
+        if (activeFeatures.has(filterType)) {
+          activeFeatures.delete(filterType);
+          this.classList.remove('active');
+        } else {
+          activeFeatures.add(filterType);
+          this.classList.add('active');
+        }
+
+        if (activeFeatures.size === 0) {
+          btnAll.classList.add('active');
+        } else {
+          btnAll.classList.remove('active');
+        }
+
+        applyIntersectionFilter();
+      });
     });
+
+    let searchInput = document.getElementById('search-input');
+    if (searchInput) {
+      searchInput.addEventListener('input', function() {
+        currentSearchQuery = this.value.toLowerCase();
+        applyIntersectionFilter(); 
+      });
+    }
+
+    // Kunci pintunya agar fungsi ini tidak ditambahkan lagi di tarikan data berikutnya
+    isFilterEventAttached = true; 
   }
 }
 
