@@ -141,7 +141,7 @@ let wilayahClause1 = '';
     .replace(/<PLACEHOLDER_WILAYAH_1>/g, wilayahClause1)
     .replace(/<PLACEHOLDER_WILAYAH_2>/g, wilayahClause2)
     .replace(/<PLACEHOLDER_JENIS>/g, inputTxt);
-
+console.log("Kueri yang dikirim ke Wikidata:", dynamicQuery); // Lihat hasilnya di F12 -> Console
   return queryWdqsThenProcess(
     dynamicQuery,
     function(result) {
