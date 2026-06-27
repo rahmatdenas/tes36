@@ -12,12 +12,9 @@ const KUMPULAN_KUERI_0 = {
             wdt:P131 ?p131Lokasi .
       ?p131Lokasi wdt:P131* ?provinsi .
     }
-    UNION
-    {
-      <PLACEHOLDER_WILAYAH_2>
-      ?site wdt:P31 ?jenis ;
-            wdt:P131 ?p131Lokasi .
-    }    
+    
+    <PLACEHOLDER_UNION_EKSTRA>
+    
     OPTIONAL { 
       ?site p:P571 ?inceptionStmt .
       ?inceptionStmt psv:P571 ?inceptionNode .
@@ -32,52 +29,54 @@ const KUMPULAN_KUERI_0 = {
   }`,
 
   'pers': `SELECT DISTINCT ?siteQid ?siteLabel ?provinsiQid ?provinsiLabel ?p131LokasiLabel ?tahunBerdiriMentah ?tahunPresisi
-WHERE {
-  VALUES ?jenis {<PLACEHOLDER_JENIS> } 
-
-  <PLACEHOLDER_WILAYAH_1>
-  
-  ?site wdt:P31 ?jenis ;
-        wdt:P159  ?p131Lokasi .
-  
-  ?p131Lokasi wdt:P131* ?provinsi .
-  
-  OPTIONAL { 
-    ?site p:P571 ?inceptionStmt .
-    ?inceptionStmt psv:P571 ?inceptionNode .
-    ?inceptionNode wikibase:timeValue ?tahunBerdiriMentah ;
-                   wikibase:timePrecision ?tahunPresisi .
-  }
-  
-  BIND(SUBSTR(STR(?site), 32) AS ?siteQid) .
-  BIND(SUBSTR(STR(?provinsi), 32) AS ?provinsiQid) .
-  
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "id". }
-}`,
+  WHERE {
+    VALUES ?jenis {<PLACEHOLDER_JENIS> } 
+    {
+      <PLACEHOLDER_WILAYAH_1>
+      ?site wdt:P31 ?jenis ;
+            wdt:P159  ?p131Lokasi .
+      ?p131Lokasi wdt:P131* ?provinsi .
+    }
+    
+    <PLACEHOLDER_UNION_EKSTRA>
+    
+    OPTIONAL { 
+      ?site p:P571 ?inceptionStmt .
+      ?inceptionStmt psv:P571 ?inceptionNode .
+      ?inceptionNode wikibase:timeValue ?tahunBerdiriMentah ;
+                     wikibase:timePrecision ?tahunPresisi .
+    }
+    
+    BIND(SUBSTR(STR(?site), 32) AS ?siteQid) .
+    BIND(SUBSTR(STR(?provinsi), 32) AS ?provinsiQid) .
+    
+    SERVICE wikibase:label { bd:serviceParam wikibase:language "id". }
+  }`,
 
   'publikasi': `SELECT DISTINCT ?siteQid ?siteLabel ?provinsiQid ?provinsiLabel ?p131LokasiLabel ?tahunBerdiriMentah ?tahunPresisi
-WHERE {
-  VALUES ?jenis {<PLACEHOLDER_JENIS> } 
-
-  <PLACEHOLDER_WILAYAH_1>
-  
-  ?site wdt:P31 ?jenis ;
-        wdt:P291  ?p131Lokasi .
-  
-  ?p131Lokasi wdt:P131* ?provinsi .
-  
-  OPTIONAL { 
-    ?site p:P571 ?inceptionStmt .
-    ?inceptionStmt psv:P571 ?inceptionNode .
-    ?inceptionNode wikibase:timeValue ?tahunBerdiriMentah ;
-                   wikibase:timePrecision ?tahunPresisi .
-  }
-  
-  BIND(SUBSTR(STR(?site), 32) AS ?siteQid) .
-  BIND(SUBSTR(STR(?provinsi), 32) AS ?provinsiQid) .
-  
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "id". }
-}`,
+  WHERE {
+    VALUES ?jenis {<PLACEHOLDER_JENIS> } 
+    {
+      <PLACEHOLDER_WILAYAH_1>
+      ?site wdt:P31 ?jenis ;
+            wdt:P291  ?p131Lokasi .
+      ?p131Lokasi wdt:P131* ?provinsi .
+    }
+    
+    <PLACEHOLDER_UNION_EKSTRA>
+    
+    OPTIONAL { 
+      ?site p:P571 ?inceptionStmt .
+      ?inceptionStmt psv:P571 ?inceptionNode .
+      ?inceptionNode wikibase:timeValue ?tahunBerdiriMentah ;
+                     wikibase:timePrecision ?tahunPresisi .
+    }
+    
+    BIND(SUBSTR(STR(?site), 32) AS ?siteQid) .
+    BIND(SUBSTR(STR(?provinsi), 32) AS ?provinsiQid) .
+    
+    SERVICE wikibase:label { bd:serviceParam wikibase:language "id". }
+  }`,
 
   'fiksi': `SELECT DISTINCT ?siteQid ?siteLabel ?provinsiQid ?provinsiLabel ?p131LokasiLabel ?tahunBerdiriMentah ?tahunPresisi
 WHERE {
@@ -89,7 +88,7 @@ WHERE {
         wdt:P840  ?p131Lokasi .
   
   ?p131Lokasi wdt:P131* ?provinsi .
-  
+      <PLACEHOLDER_UNION_EKSTRA>
   OPTIONAL { 
     ?site p:P571 ?inceptionStmt .
     ?inceptionStmt psv:P571 ?inceptionNode .
@@ -113,7 +112,7 @@ WHERE {
         wdt:P19  ?lahir .
   
   ?lahir wdt:P131* ?provinsi .
-  
+      <PLACEHOLDER_UNION_EKSTRA>
   OPTIONAL { 
     ?site p:P571 ?inceptionStmt .
     ?inceptionStmt psv:P571 ?inceptionNode .
@@ -136,7 +135,7 @@ WHERE {
         wdt:P2341 ?berasaldari .
   
   ?berasaldari wdt:P131* ?provinsi .
-  
+      <PLACEHOLDER_UNION_EKSTRA>
   OPTIONAL { 
     ?site p:P571 ?inceptionStmt .
     ?inceptionStmt psv:P571 ?inceptionNode .
@@ -160,7 +159,7 @@ WHERE {
         wdt:P276 ?p131Lokasi .
   
   ?p131Lokasi wdt:P131* ?provinsi .
-  
+      <PLACEHOLDER_UNION_EKSTRA>
   OPTIONAL { 
     ?site p:P571 ?inceptionStmt .
     ?inceptionStmt psv:P571 ?inceptionNode .
